@@ -7,7 +7,6 @@ export const subtask = sqliteTable("subTask", {
   id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
 
   title: text("title").notNull(),
-  description: text("description").notNull(),
 
   notes: text("notes").notNull(),
 
