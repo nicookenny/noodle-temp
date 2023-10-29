@@ -1,10 +1,11 @@
 import { relations, sql } from "drizzle-orm";
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { integer, text } from "drizzle-orm/sqlite-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { moduleTable } from "./module";
+import { sqliteTable } from "./noodle_table";
 import { subtask } from "./subtask";
 
-export const task = sqliteTable("task", {
+export const taskTable = sqliteTable("task", {
   id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
 
   title: text("title").notNull(),
@@ -33,27 +34,30 @@ export const task = sqliteTable("task", {
     .default(sql`CURRENT_TIMESTAMP`),
 });
 
-export type Task = typeof task.$inferSelect;
-export type NewTask = typeof task.$inferInsert;
+export type Task = typeof taskTable.$inferSelect;
+export type NewTask = typeof taskTable.$inferInsert;
 
-export const taskRelations = relations(task, ({ one, many }) => ({
-  module: one(moduleTable),
+export const taskRelations = relations(taskTable, ({ one, many }) => ({
+  module: one(moduleTable,{
+    fields:[taskTable.moduleId],
+    references:[moduleTable.id]
+  }),
   subtask: many(subtask),
 }));
 
-export const insertTaskSchema = createInsertSchema(task).omit({
+export const insertTaskSchema = createInsertSchema(taskTable).omit({
   id: true,
   done: true,
   doneAt: true,
   createdAt: true,
 });
 
-export const updateTaskSchema = createInsertSchema(task).omit({
+export const updateTaskSchema = createInsertSchema(taskTable).omit({
   moduleId: true,
   done: true,
 });
 
-export const selectTaskSchema = createSelectSchema(task).omit({
+export const selectTaskSchema = createSelectSchema(taskTable).omit({
   createdAt: true,
   description: true,
   priority: true,

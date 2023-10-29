@@ -1,9 +1,10 @@
 import { relations, sql } from "drizzle-orm";
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { integer, text } from "drizzle-orm/sqlite-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import { task } from "./task";
+import { sqliteTable } from "./noodle_table";
+import { taskTable } from "./task";
 
-export const subtask = sqliteTable("subTask", {
+export const subtask = sqliteTable("subtask", {
   id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
 
   title: text("title").notNull(),
@@ -14,7 +15,7 @@ export const subtask = sqliteTable("subTask", {
   doneAt: text("doneAt"),
 
   taskId: integer("task_id")
-    .references(() => task.id)
+    .references(() => taskTable.id)
     .notNull(),
 
   createdAt: text("createdAt")
@@ -30,7 +31,7 @@ export type Subtask = typeof subtask.$inferSelect;
 export type NewSubtask = typeof subtask.$inferInsert;
 
 export const subtaskRelations = relations(subtask, ({ one }) => ({
-  task: one(task),
+  task: one(taskTable),
 }));
 
 export const insertSubtaskSchema = createInsertSchema(subtask).omit({
