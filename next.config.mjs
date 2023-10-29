@@ -9,6 +9,7 @@ const nextConfig = {
   swcMinify: true,
   pageExtensions: ["mdx", "ts", "tsx"],
   experimental: {
+    webpackBuildWorker: true,
     serverComponentsExternalPackages: ["libsql"],
     optimizePackageImports: ["@nextui-org/react"],
   },
