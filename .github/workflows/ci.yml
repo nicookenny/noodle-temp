@@ -1,0 +1,51 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+env:
+  # Database
+  DATABASE_URL: file:./ci.db
+
+  # Clerk
+  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}}
+  CLERK_SECRET_KEY: ${{secrets.CLERK_SECRET_KEY}}
+  NEXT_PUBLIC_CLERK_SIGN_IN_URL: /sign-in
+  NEXT_PUBLIC_CLERK_SIGN_UP_URL: /sign-up
+  NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: /app
+  NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: /app
+
+  # Upstash
+  UPSTASH_REDIS_REST_URL: ${{secrets.UPSTASH_REDIS_REST_URL}}
+  UPSTASH_REDIS_REST_TOKEN: ${{secrets.UPSTASH_REDIS_REST_TOKEN}}
+
+  # Volta
+  VOLTA_FEATURE_PNPM: 1
+
+jobs:
+  main:
+    name: CI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Volta
+        uses: volta-cli/action@v4
+
+      - name: Install Node & pnpm
+        run: volta install node && volta install pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Check format
+        run: pnpm format:check
+
+      - name: Check lint
+        run: pnpm lint
+
+      - name: Build
+        run: pnpm build
